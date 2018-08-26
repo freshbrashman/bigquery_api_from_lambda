@@ -10,8 +10,8 @@ GCP側でサービスアカウントを作成して、BigQueryのデータセッ
 
 ZIP化する
 ```
-$ cd node-gcp-test
-$ zip -r node-gcp-test.zip *
+$ cd bigquery_api_from_lambda
+$ zip -r bigquery_api_from_lambda.zip *
 ```
 
 以上で、Lambdaの「nodejs v8」 で実行できるはず。
