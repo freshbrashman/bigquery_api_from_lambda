@@ -14,3 +14,7 @@ $ cd node-gcp-test
 $ zip -r node-gcp-test.zip *
 ```
 
+以上で、Lambdaの「nodejs v8」 で実行できるはず。
+ハンドラには「index.gcpTest」を指定する。
+あと、環境変数「GOOGLE_APPLICATION_CREDENTIALS」を指定する。
+※index.jsのコメントにも説明書いてあるから、そちらも参照
