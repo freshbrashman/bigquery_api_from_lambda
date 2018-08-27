@@ -8,7 +8,7 @@ const dataflow = google.dataflow("v1b3");
 // GOOGLE_APPLICATION_CREDENTIALS=./allow_bq_storage_user.json
 
 // ./allow_bq_storage_user.json に、BigQueryのデータセット削除権限を持ったサービスアカウントの
-// JSONをダウンロードして指定すること
+// JSONをダウンロードして保存すること(このファイルはGitにあげるとヤバいのでgitignoreしています。)
 
 // Lambda実行時に、ハンドラには「index.gcpTest」を指定する
 /////////////////////////////////////////////////////////////////////////////////////////////
