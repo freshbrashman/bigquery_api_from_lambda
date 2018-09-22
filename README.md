@@ -6,7 +6,7 @@ main().catch(console.error)
 ```
 
 GCP側でサービスアカウントを作成して、BigQueryのデータセット削除できる権限以上を付与する  
-クレデンシャルのJSONをダウンロードして、allow_bq_storage_user.jsonに上書き保存する
+クレデンシャルのJSONをダウンロードして「./allow_bq_storage_user.json」として保存する
 
 ZIP化する
 ```
