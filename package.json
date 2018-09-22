@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.314.0",
+    "byline": "^5.0.0",
     "googleapis": "^33.0.0"
   }
 }
