@@ -33,14 +33,14 @@ async function runStorageTransfer() {
 
     const params = {
         requestBody: {
-            name: "",
-            description: "",
+            name: "transfer-test-01",
+            description: "transfer-test-01",
             transferSpec: {
                 awsS3DataSource: {
                     bucketName: "yterui-test-bucket-01",
                     awsAccessKey: {
-                        accessKeyId: "",
-                        secretAccessKey: "",
+                        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
                     }
                 },
                 gcsDataSink: {
