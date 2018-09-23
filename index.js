@@ -47,21 +47,21 @@ async function runStorageTransfer() {
                     bucketName: "yterui-transfer-test",
                 },
                 objectConditions: {
-                    maxTimeElapsedSinceLastModification: 60*60*24*5 + "s",
+                    maxTimeElapsedSinceLastModification: 60*60*24*5 + "s",  // 5日以内に更新されたモノ
                     includePrefixes: [],
                     excludePrefixes: [],
                 },
                 transferOptions: {
-                    overwriteObjectsAlreadyExistingInSink: false,
-                    deleteObjectsUniqueInSink: false,
-                    deleteObjectsFromSourceAfterTransfer: false,
+                    overwriteObjectsAlreadyExistingInSink: false,   // シンクにあるオブジェクトをお常に上書きするか
+                    deleteObjectsUniqueInSink: false,               // シンクにしかないオブジェクトを削除するか
+                    deleteObjectsFromSourceAfterTransfer: false,    // シンクに転送したソースのオブジェクトを削除するか
                 },
             },
         },
         auth: client
     };
 
-    storageTransfer.transferJobs.create(params)
+    storageTransfer.transferJobs.create(params);
 
     const res = await bigquery.datasets.delete(request);
     console.log(res.data);
@@ -102,8 +102,9 @@ async function deleteBigQueryDataset() {
     // console.log(res.data);
 }
 
-// lambdaで動かす場合は、ハンドラに「index.gcpTest」を指定する
-exports.gcpTest = deleteBigQueryDataset;
+// lambdaで動かす場合は、ハンドラに「runStorageTransfer」を指定する
+exports.deleteBigQueryDataset = deleteBigQueryDataset;
+exports.runStorageTransfer = runStorageTransfer;
 
 // テスト・デバッグ時に有効化する
-main().catch(console.error);
+runStorageTransfer().catch(console.error);
