@@ -8,9 +8,12 @@ const LineStream = require('byline').LineStream;
 
 //////////////////////　実行準備 ////////////////////////////////////////////////////////////
 // Lambda登録時に環境変数「GOOGLE_APPLICATION_CREDENTIALS」を指定する
-// GOOGLE_APPLICATION_CREDENTIALS=./allow_bq_storage_user.json
+// GOOGLE_APPLICATION_CREDENTIALS=./gcp_user.json
+// GCPからAWSのクレデンシャルが必要な処理を実行する場合は、通常通り以下２つの環境変数を設定する
+// - AWS_ACCESS_KEY_ID
+// - AWS_SECRET_ACCESS_KEY
 
-// ./allow_bq_storage_user.json に、BigQueryのデータセット削除権限を持ったサービスアカウントの
+// ./gcp_user.json に、GCP側の利用サービスの権限を持ったサービスアカウントの
 // JSONをダウンロードして保存すること(このファイルはGitにあげるとヤバいのでgitignoreしています。)
 
 // Lambda実行時に、ハンドラには「index.gcpTest」を指定する
