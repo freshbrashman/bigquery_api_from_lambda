@@ -21,8 +21,17 @@ const LineStream = require('byline').LineStream;
 
 async function runStorageTransfer() {
 
-    // This method looks for the GCLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS
-    // environment variables.
+    // ※API経由でTransferServiceを使うには、
+    // 　「APIs & Services」画面で「Storage Transfer API」を友好にする必要がある。
+    //
+    // ※APIを有効にし忘れて実行したときのエラーメッセージに書かれたURLが途中で切れている
+    // 　("Storage Transfer API has not been used in project"という件のエラー)
+    // 　以下が正しい
+    // 　→ https://console.developers.google.com/apis/api/storagetransfer
+    //
+    // ※GCP側のStorageServiceを実行するサービスアカウントには、なんと！「EDITOR」権限が必要とのこと。
+    // 　情報元→　https://cloud.google.com/storage-transfer/docs/create-client
+
     const client = await google.auth.getClient({
         // Scopes can be specified either as an array or as a single, space-delimited string.
         scopes: [
@@ -36,8 +45,21 @@ async function runStorageTransfer() {
 
     const params = {
         requestBody: {
-            name: "transfer-test-01",
+            projectId: projectId,
             description: "transfer-test-01",
+            status: "ENABLED",
+            schedule: {
+                scheduleStartDate: {
+                    year: 2000,
+                    month: 1,
+                    day: 1,
+                },
+                scheduleEndDate: {
+                    year: 2000,
+                    month: 1,
+                    day: 1,
+                }
+            },
             transferSpec: {
                 awsS3DataSource: {
                     bucketName: "yterui-test-bucket-01",
@@ -64,13 +86,8 @@ async function runStorageTransfer() {
         auth: client
     };
 
-    storageTransfer.transferJobs.create(params);
-
-    const res = await bigquery.datasets.delete(request);
+    const res = await storageTransfer.transferJobs.create(params);
     console.log(res.data);
-
-    
-
 }
 
 async function deleteBigQueryDataset() {
