@@ -18,8 +18,85 @@ const LineStream = require('byline').LineStream;
 
 // Lambda実行時に、ハンドラには「index.gcpTest」を指定する
 /////////////////////////////////////////////////////////////////////////////////////////////
+async function loadBigQueryTable() {
+    // This method looks for the GCLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS
+    // environment variables.
+    const client = await google.auth.getClient({
+        // Scopes can be specified either as an array or as a single, space-delimited string.
+        scopes: [
+            'https://www.googleapis.com/auth/bigquery',
+            'https://www.googleapis.com/auth/devstorage.full_control'
+        ]
+    });
 
-async function runStorageTransfer() {
+    // obtain the current project Id
+    const projectId = await google.auth.getDefaultProjectId();
+
+    const params = {
+        projectId: projectId,
+        auth: client,
+        requestBody: {
+            configuration: {
+                dryRun: false,
+                jobTimeoutMs: 1000 * 60 * 6,    // 6分タイムアウト
+                load: {
+                    createDisposition: "CREATE_IF_NEEDED",
+                    writeDisposition: "WRITE_TRUNCATE",
+                    sourceFormat: "NEWLINE_DELIMITED_JSON",
+                    sourceUris: [
+                        "gs://yterui-function-test/bq_load_test/*",  // データソースのURIを指定
+                    ],
+                    destinationTable: {         // ロード先テーブル
+                        projectId: projectId,
+                        datasetId: "test01",
+                        tableId: "load_test_01",
+                    },
+                    destinationTableProperties: {
+                        description: "テーブルロードだぜ",
+                        friendlyName: "フレンドリーネームだぜ",
+
+                    },
+                    encoding: "UTF-8",          // データソースのエンコード
+                    ignoreUnknownValues: false, // 異常値を無視するか(無視された場合はたぶんんnull扱い？Docに明記されていない)
+                    maxBadRecords: 0,           // 異常値の許容数
+                    autodetect: true,           // [CSV/JSONのみ] スキーマの自動推定機能の利用
+//                    schema: {
+//                        fields: [
+//                            {name: "", mode: "", type: ""},
+//                        ]
+//                    }
+
+//                    schemaUpdateOptions: [      // WRITE_APPENDか、「WRITE_TRUNCATEかつパーティショニング」のどちらかの場合指定する
+//                        "ALLOW_FIELD_ADDITION",
+//                        "ALLOW_FIELD_RELAXATION",
+//                    ],
+
+//                    allowJaggedRows: false,     // [CSVのみ]CSV末尾の空列を許容するか？
+//                    allowQuotedNewlines: false, // [CSVのみ]クォートで括られたデータの改行コードを許容するか？
+//                    quote: "",                  // [CSVのみ]クォート文字
+//                    nullMarker: "",           // [CSVのみ]NULL値を意味する文字
+//                    fieldDelimiter: "",       // CSV系の場合の区切り文字
+//                    clustering: {                 // カラム指定のクラスタリング？(ベータらしい)
+//                        fields: ["col1", "col2"]
+//                    },
+//                    skipLeadingRows: 0,       // [CSVのみ]先頭行の読み飛ばし数
+//                    destinationEncryptionConfiguration: {     // KMSなど暗号化オプション
+//                        …
+//                    },
+//                    projectionFields: []      // [Datastoreのみ？]
+//                    timePartitioning: {}      // timeパーティション系
+                }
+            }
+        }
+    };
+
+//    const res = await bigquery.datasets.delete(params);
+    res = await bigquery.jobs.insert(params);
+    console.log(JSON.stringify(res.data));
+}
+
+
+async function runStorageTransferService() {
 
     // ※API経由でTransferServiceを使うには、
     // 　「APIs & Services」画面で「Storage Transfer API」を友好にする必要がある。
@@ -106,7 +183,7 @@ async function deleteBigQueryDataset() {
     const projectId = await google.auth.getDefaultProjectId();
 
     const request = {
-        projectId,
+        projectId: projectId,
         datasetId: 'test_ds_xxx',
 
         // This is a "request-level" option
@@ -115,16 +192,12 @@ async function deleteBigQueryDataset() {
 
     const res = await bigquery.datasets.delete(request);
     console.log(res.data);
-
-    
-
-    // const res = await compute.zones.list({ project, auth });
-    // console.log(res.data);
 }
 
 // lambdaで動かす場合は、ハンドラに「runStorageTransfer」を指定する
 exports.deleteBigQueryDataset = deleteBigQueryDataset;
-exports.runStorageTransfer = runStorageTransfer;
+exports.runStorageTransferService = runStorageTransferService;
+exports.loadBigQueryTable = loadBigQueryTable;
 
 // テスト・デバッグ時に有効化する
-runStorageTransfer().catch(console.error);
+loadBigQueryTable().catch(console.error);
