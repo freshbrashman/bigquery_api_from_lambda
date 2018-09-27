@@ -38,17 +38,17 @@ async function loadBigQueryTable() {
         requestBody: {
             configuration: {
                 dryRun: false,
-                jobTimeoutMs: 1000 * 60 * 6,    // 6分タイムアウト
+                jobTimeoutMs: 1000 * 60 * 20,    // 20分タイムアウト
                 load: {
                     createDisposition: "CREATE_IF_NEEDED",
                     writeDisposition: "WRITE_TRUNCATE",
                     sourceFormat: "NEWLINE_DELIMITED_JSON",
                     sourceUris: [
-                        "gs://yterui-function-test/bq_load_test/*",  // データソースのURIを指定
+                        "gs://yterui-function-test/bq_load_test/bq_load_test.json",  // データソースのURIを指定(*によるワイルドカード指定可)
                     ],
                     destinationTable: {         // ロード先テーブル
                         projectId: projectId,
-                        datasetId: "test01",
+                        datasetId: "test02",
                         tableId: "load_test_01",
                     },
                     destinationTableProperties: {
@@ -90,9 +90,19 @@ async function loadBigQueryTable() {
         }
     };
 
-//    const res = await bigquery.datasets.delete(params);
     res = await bigquery.jobs.insert(params);
     console.log(JSON.stringify(res.data));
+
+// 複数テーブル同時書き込みの場合のサンプルコード
+/*
+    for (var i = 0; i < 200; i++){
+        const newParams = JSON.parse(JSON.stringify(params));
+        newParams.auth = client;
+        newParams.requestBody.configuration.load.destinationTable.tableId = "takusan_test_" + i;
+        res = bigquery.jobs.insert(newParams);
+        console.log(JSON.stringify(res.data));
+    }
+*/    
 }
 
 
